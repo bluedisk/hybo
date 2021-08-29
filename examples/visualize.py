@@ -1,9 +1,6 @@
-import time
-
 import cv2
-import numpy as np
-
 import hybo
+import numpy as np
 
 SCALE = 0.5
 WIDTH = 2000
@@ -31,15 +28,17 @@ if __name__ == "__main__":
 
             # make a background canvas
             img = np.zeros((WIDTH, HEIGHT, 3), np.uint8)
-            cv2.circle(img, (HCENTER, HEIGHT), LIDAR_SIZE, LIDAR_COLOR)
+            cv2.circle(img, (HCENTER, 0), LIDAR_SIZE, LIDAR_COLOR)
 
-            # scaling & flip points
-            points = frame['points'] * (SCALE, -SCALE, SCALE) + (HCENTER, HEIGHT, 0)
-            points = points.clip(min=0, max=min(WIDTH, HEIGHT)).astype('uint32')
+            # points projection
+            points = frame['points'] * SCALE
+            points += (HCENTER, HEIGHT, 0)
+            points = points.clip(min=0, max=min(WIDTH, HEIGHT))
 
             # draw points
             for x, y, _ in points:
                 cv2.circle(img, (x, y), DOT_SIZE, DOT_COLOR)
 
             # update image
+            cv2.flip(img, 0)
             cv2.imshow("Lidar", img)
